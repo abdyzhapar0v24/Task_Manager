@@ -1,0 +1,67 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2>Мои задачи</h2>
+
+<a href="{% url 'task_create_page' %}" class="btn-create">Создать новую задачу</a>
+
+<!-- ---------- Статистика ---------- -->
+<div class="stats">
+    <span>Всего задач: {{ todo_count|add:in_progress_count|add:done_count }}</span>
+    <span>To Do: {{ todo_count }}</span>
+    <span>In Progress: {{ in_progress_count }}</span>
+    <span>Done: {{ done_count }}</span>
+</div>
+
+
+<!-- ---------- Форма фильтров, поиска и сортировки ---------- -->
+<form method="get" class="filter-form">
+    <input type="text" name="search" placeholder="Поиск по названию" value="{{ search }}">
+
+    <select name="status">
+        <option value="" {% if not status %}selected{% endif %}>Все статусы</option>
+        <option value="todo" {% if status == "todo" %}selected{% endif %}>To Do</option>
+        <option value="in_progress" {% if status == "in_progress" %}selected{% endif %}>In Progress</option>
+        <option value="done" {% if status == "done" %}selected{% endif %}>Done</option>
+    </select>
+
+    <input type="date" name="deadline" value="{{ deadline }}">
+
+    <select name="ordering">
+        <option value="" {% if not ordering %}selected{% endif %}>Без сортировки</option>
+        <option value="created_at" {% if ordering == "created_at" %}selected{% endif %}>Старые сначала</option>
+        <option value="-created_at" {% if ordering == "-created_at" %}selected{% endif %}>Новые сначала</option>
+    </select>
+
+    <button type="submit">Применить</button>
+    <a href="{% url 'task_list_page' %}" class="btn-reset">Сбросить</a>
+</form>
+
+<!-- ---------- Список задач ---------- -->
+<ul class="task-list">
+{% for task in tasks %}
+    <li>
+        <strong>{{ task.title }}</strong> - {{ task.status|capfirst }} - {{ task.deadline }}
+        <a href="{% url 'task_detail_page' task.id %}">Подробнее</a> |
+        <a href="{% url 'task_update_page' task.id %}">Редактировать</a> |
+        <a href="{% url 'task_delete_page' task.id %}">Удалить</a>
+    </li>
+{% empty %}
+    <li>Задач нет</li>
+{% endfor %}
+</ul>
+
+<!-- ---------- Пагинация ---------- -->
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+        <a href="?page={{ page|add:"-1" }}{% if status %}&status={{ status }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">Назад</a>
+    {% endif %}
+    <span>Страница {{ page }} из {{ total_pages }}</span>
+    {% if page < total_pages %}
+        <a href="?page={{ page|add:"1" }}{% if status %}&status={{ status }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">Вперед</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

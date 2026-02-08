@@ -1,0 +1,11 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<h2>Вход</h2>
+<form method="post">
+    {% csrf_token %}
+    <p><input type="email" name="email" placeholder="Email" required></p>
+    <p><input type="password" name="password" placeholder="Пароль" required></p>
+    <button type="submit">Войти</button>
+</form>
+<a href="{% url 'register_page' %}">Нет аккаунта? Зарегистрироваться</a>
+{% endblock %}
