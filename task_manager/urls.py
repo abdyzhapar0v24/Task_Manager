@@ -19,10 +19,13 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/pages/tasks/', permanent=False)),
 
     path('admin/', admin.site.urls),
+    path('api/', include('tasks.urls_api')),
 
     # ⬅️ ВАЖНО: подключаем ОДИН РАЗ
     path('', include('tasks.urls')),
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0)),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0)),
+
+
 ]
