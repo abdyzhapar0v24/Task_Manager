@@ -1,10 +1,73 @@
 {% extends 'tasks/base.html' %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h2>{{ title }}</h2>
-<form method="post">
+
+<h2 class="text-3xl font-bold neon mb-6">{{ title }}</h2>
+
+<form method="post" class="flex flex-col gap-4 bg-gray-800 p-6 rounded shadow-lg">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить</button>
+
+    <!-- Ошибки формы -->
+    {% if form.non_field_errors %}
+        <div class="text-red-500 mb-2">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Название -->
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="{{ form.title.id_for_label }}">
+            {{ form.title.label }} *
+        </label>
+        <input type="text" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
+               value="{{ form.title.value|stringformat:'s' }}"
+               class="bg-gray-900 text-white p-2 rounded border border-gray-700">
+        {% if form.title.errors %}
+            <span class="text-red-500 text-sm mt-1">{{ form.title.errors|join:", " }}</span>
+        {% endif %}
+    </div>
+
+    <!-- Описание -->
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="{{ form.description.id_for_label }}">
+            {{ form.description.label }} *
+        </label>
+        <textarea name="{{ form.description.html_name }}" id="{{ form.description.id_for_label }}"
+                  class="bg-gray-900 text-white p-2 rounded border border-gray-700">{{ form.description.value|stringformat:'s' }}</textarea>
+        {% if form.description.errors %}
+            <span class="text-red-500 text-sm mt-1">{{ form.description.errors|join:", " }}</span>
+        {% endif %}
+    </div>
+
+    <!-- Статус -->
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="{{ form.status.id_for_label }}">
+            {{ form.status.label }}
+        </label>
+        <select name="{{ form.status.html_name }}" id="{{ form.status.id_for_label }}"
+                class="bg-gray-900 text-white p-2 rounded border border-gray-700">
+            {% for val, text in form.status.field.choices %}
+                <option value="{{ val }}" {% if form.status.value == val %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Дедлайн -->
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="{{ form.deadline.id_for_label }}">
+            {{ form.deadline.label }}
+        </label>
+        <input type="date" name="{{ form.deadline.html_name }}" id="{{ form.deadline.id_for_label }}"
+               value="{{ form.deadline.value|stringformat:'s' }}"
+               class="bg-gray-900 text-white p-2 rounded border border-gray-700">
+        {% if form.deadline.errors %}
+            <span class="text-red-500 text-sm mt-1">{{ form.deadline.errors|join:", " }}</span>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn-neon px-4 py-2 rounded w-32 mt-2">Сохранить</button>
 </form>
-<a href="{% url 'task_list_page' %}">Назад</a>
+
 {% endblock %}

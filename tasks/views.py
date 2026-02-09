@@ -108,7 +108,7 @@ def task_list_page(request):
 @login_required
 def task_detail_page(request, pk):
     task = get_object_or_404(Task, pk=pk, owner=request.user)
-    return render(request, 'tasks/task_detail.html', {'task': task})
+    return render(request, 'tasks/task_detail.html', {'tasks': task})
 
 @login_required
 def task_create_page(request):
@@ -141,4 +141,4 @@ def task_delete_page(request, pk):
     if request.method == 'POST':
         task.delete()
         return redirect('task_list_page')
-    return render(request, 'tasks/task_delete.html', {'task': task})
+    return render(request, 'tasks/task_delete.html', {'tasks': task})

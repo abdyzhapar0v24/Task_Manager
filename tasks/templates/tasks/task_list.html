@@ -1,25 +1,14 @@
 {% extends 'tasks/base.html' %}
-
+{% block title %}Мои задачи{% endblock %}
 {% block content %}
-<h2>Мои задачи</h2>
 
-<a href="{% url 'task_create_page' %}" class="btn-create">Создать новую задачу</a>
+<h2 class="text-4xl font-bold mb-6 neon">Мои задачи</h2>
 
-<!-- ---------- Статистика ---------- -->
-<div class="stats">
-    <span>Всего задач: {{ todo_count|add:in_progress_count|add:done_count }}</span>
-    <span>To Do: {{ todo_count }}</span>
-    <span>In Progress: {{ in_progress_count }}</span>
-    <span>Done: {{ done_count }}</span>
-</div>
-
-
-<!-- ---------- Форма фильтров, поиска и сортировки ---------- -->
-<form method="get" class="filter-form">
-    <input type="text" name="search" placeholder="Поиск по названию" value="{{ search }}">
+<form method="get" class="mb-6 flex flex-wrap gap-2 items-center bg-gray-800 p-4 rounded shadow-lg">
+    <input type="text" name="search" placeholder="Поиск..." value="{{ search }}">
 
     <select name="status">
-        <option value="" {% if not status %}selected{% endif %}>Все статусы</option>
+        <option value="">Все статусы</option>
         <option value="todo" {% if status == "todo" %}selected{% endif %}>To Do</option>
         <option value="in_progress" {% if status == "in_progress" %}selected{% endif %}>In Progress</option>
         <option value="done" {% if status == "done" %}selected{% endif %}>Done</option>
@@ -28,40 +17,47 @@
     <input type="date" name="deadline" value="{{ deadline }}">
 
     <select name="ordering">
-        <option value="" {% if not ordering %}selected{% endif %}>Без сортировки</option>
-        <option value="created_at" {% if ordering == "created_at" %}selected{% endif %}>Старые сначала</option>
-        <option value="-created_at" {% if ordering == "-created_at" %}selected{% endif %}>Новые сначала</option>
+        <option value="">Сортировка</option>
+        <option value="created_at" {% if ordering == "created_at" %}selected{% endif %}>Сначала старые</option>
+        <option value="-created_at" {% if ordering == "-created_at" %}selected{% endif %}>Сначала новые</option>
     </select>
 
-    <button type="submit">Применить</button>
-    <a href="{% url 'task_list_page' %}" class="btn-reset">Сбросить</a>
+    <button type="submit" class="btn-neon px-4 py-2 rounded">Применить</button>
+    <a href="{% url 'task_create_page' %}" class="btn-neon px-4 py-2 rounded">+ Создать задачу</a>
 </form>
 
-<!-- ---------- Список задач ---------- -->
-<ul class="task-list">
-{% for task in tasks %}
-    <li>
-        <strong>{{ task.title }}</strong> - {{ task.status|capfirst }} - {{ task.deadline }}
-        <a href="{% url 'task_detail_page' task.id %}">Подробнее</a> |
-        <a href="{% url 'task_update_page' task.id %}">Редактировать</a> |
-        <a href="{% url 'task_delete_page' task.id %}">Удалить</a>
-    </li>
-{% empty %}
-    <li>Задач нет</li>
-{% endfor %}
-</ul>
+<div class="mb-6 flex gap-4 flex-wrap">
+    <div class="bg-gray-800 p-3 rounded shadow neon">To Do: {{ todo_count }}</div>
+    <div class="bg-gray-800 p-3 rounded shadow neon">In Progress: {{ in_progress_count }}</div>
+    <div class="bg-gray-800 p-3 rounded shadow neon">Done: {{ done_count }}</div>
+</div>
 
-<!-- ---------- Пагинация ---------- -->
-{% if total_pages > 1 %}
-<div class="pagination">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for task in tasks %}
+    <div class="card bg-gray-800 rounded shadow p-4 hover:bg-gray-700">
+        <h3 class="text-2xl font-semibold text-cyan-300 neon">{{ task.title }}</h3>
+        <p class="text-gray-300 mt-2">{{ task.description|truncatewords:20 }}</p>
+        <p class="mt-2 text-sm text-gray-400">Статус: <span class="capitalize">{{ task.status }}</span></p>
+        <p class="text-sm text-gray-400">Дедлайн: {% if task.deadline %}{{ task.deadline }}{% else %}-{% endif %}</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+            <a href="{% url 'task_detail_page' task.pk %}" class="text-cyan-300 hover:underline neon">Подробнее</a>
+            <a href="{% url 'task_update_page' task.pk %}" class="btn-neon px-2 py-1 rounded">Редактировать</a>
+            <a href="{% url 'task_delete_page' task.pk %}" class="btn-neon px-2 py-1 rounded bg-red-500 hover:bg-red-600">Удалить</a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="col-span-full text-center text-gray-400">Задачи не найдены</p>
+    {% endfor %}
+</div>
+
+<div class="mt-6 flex justify-center gap-2">
     {% if page > 1 %}
-        <a href="?page={{ page|add:"-1" }}{% if status %}&status={{ status }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">Назад</a>
+    <a href="?page={{ page|add:"-1" }}&status={{ status }}&deadline={{ deadline }}&search={{ search }}&ordering={{ ordering }}" class="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 neon">Назад</a>
     {% endif %}
-    <span>Страница {{ page }} из {{ total_pages }}</span>
+    <span class="px-3 py-1 bg-gray-600 rounded neon">{{ page }} / {{ total_pages }}</span>
     {% if page < total_pages %}
-        <a href="?page={{ page|add:"1" }}{% if status %}&status={{ status }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">Вперед</a>
+    <a href="?page={{ page|add:"1" }}&status={{ status }}&deadline={{ deadline }}&search={{ search }}&ordering={{ ordering }}" class="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 neon">Вперёд</a>
     {% endif %}
 </div>
-{% endif %}
 
 {% endblock %}

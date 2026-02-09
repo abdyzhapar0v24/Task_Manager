@@ -1,11 +1,34 @@
 {% extends 'tasks/base.html' %}
+{% block title %}Вход{% endblock %}
 {% block content %}
-<h2>Вход</h2>
-<form method="post">
+
+<h2 class="text-4xl font-bold mb-6 neon">Вход</h2>
+
+<form method="post" class="bg-gray-800 p-6 rounded shadow-lg max-w-md mx-auto flex flex-col gap-4">
     {% csrf_token %}
-    <p><input type="email" name="email" placeholder="Email" required></p>
-    <p><input type="password" name="password" placeholder="Пароль" required></p>
-    <button type="submit">Войти</button>
+
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="email">Email</label>
+        <input type="email" name="email" required>
+    </div>
+
+    <div class="flex flex-col">
+        <label class="mb-1 text-gray-300 font-semibold" for="password">Пароль</label>
+        <input type="password" name="password" required>
+    </div>
+
+    {% if messages %}
+    <div class="text-red-500">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="flex gap-4 mt-4">
+        <button type="submit" class="btn-neon px-4 py-2 rounded">Войти</button>
+        <a href="{% url 'register_page' %}" class="btn-neon px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Регистрация</a>
+    </div>
 </form>
-<a href="{% url 'register_page' %}">Нет аккаунта? Зарегистрироваться</a>
+
 {% endblock %}

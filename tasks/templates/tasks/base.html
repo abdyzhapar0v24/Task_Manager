@@ -1,26 +1,88 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Task Manager</title>
-    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #111827; color: #e5e7eb; }
+
+        /* --- Неоновые эффекты --- */
+        .neon { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff; }
+
+        .btn-neon {
+            background: linear-gradient(45deg,#0ff,#06b6d4);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+            transition: all 0.3s ease;
+        }
+
+        .btn-neon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+        }
+
+        .btn-neon:active {
+            transform: translateY(1px);
+            box-shadow: 0 0 5px #0ff;
+        }
+
+        .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(0,255,255,0.4); }
+
+        /* --- Поля форм --- */
+        input, select, textarea {
+            background-color: #1f2937;
+            color: #fff;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            transition: all 0.3s;
+            appearance: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+            border-color: #0ff;
+        }
+
+        /* --- Календарь с видимой иконкой --- */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-clear-button { display: none; }
+
+        /* --- Welcome screen overlay --- */
+        #welcomeOverlay { transition: opacity 1s; }
+
+    </style>
 </head>
-<body>
-<header>
-    <h1>Task Manager</h1>
-    <nav>
-        <a href="{% url 'task_list_page' %}">Мои задачи</a>
+<body class="min-h-screen flex flex-col">
+
+<header class="bg-gray-800 p-4 flex justify-between items-center shadow-lg">
+    <h1 class="text-2xl font-bold neon"><a href="{% url 'task_list_page' %}">Task Manager</a></h1>
+    <nav class="space-x-4">
         {% if user.is_authenticated %}
-            <a href="{% url 'logout_page' %}">Выход</a>
+            <span>Привет, {{ user.username }}!</span>
+            <a href="{% url 'task_list_page' %}" class="hover:underline">Задачи</a>
+            <a href="{% url 'logout_page' %}" class="hover:underline">Выйти</a>
         {% else %}
-            <a href="{% url 'login_page' %}">Вход</a>
-            <a href="{% url 'register_page' %}">Регистрация</a>
+            <a href="{% url 'login_page' %}" class="hover:underline">Вход</a>
+            <a href="{% url 'register_page' %}" class="hover:underline">Регистрация</a>
         {% endif %}
     </nav>
 </header>
-<main>
+
+<main class="flex-1 container mx-auto p-6">
     {% block content %}{% endblock %}
 </main>
+
+<footer class="bg-gray-800 text-center p-4 mt-auto text-gray-400">
+    &copy; {{ now.year }} Task Manager
+</footer>
 </body>
 </html>
